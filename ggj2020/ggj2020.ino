@@ -1,25 +1,35 @@
-#include <MaxMatrix.h>
-#include <I2Cdev.h>
-#include <MPU9250.h>
+//#include <MaxMatrix.h>
+//#include <I2Cdev.h>
+//#include <MPU9250.h>
 
 // Inputs
-const int bigButtonPin = -1;
-int bigButtonState = 0;
+//const int bigButtonPin = -1;
+//int bigButtonState = 0;
 
-const int buttonTopGreenPin = -1;
-const int buttonTopRedPin = -1;
-int buttonTopGreenState = 0;
-int buttonTopRedState = 0;
+const int buttonTopRedPin = A3;
+const int buttonTopGreenPin = A2;
+int buttonTopRedState = LOW;
+int buttonTopGreenState = LOW;
+int buttonTopRedPrevState = LOW;
+int buttonTopGreenPrevState = LOW;
+unsigned long buttonTopRedTime = 0;
+unsigned long buttonTopGreenTime = 0;
 
-const int buttonSideBluePin = -1;
-const int buttonSideRedPin = -1;
-int buttonSideBlueState = 0;
-int buttonSideRedState = 0;
+const int buttonSideBluePin = A1;
+const int buttonSideGreenPin = A0;
+int buttonSideBlueState = LOW;
+int buttonSideGreenState = LOW;
+int buttonSideBluePrevState = LOW;
+int buttonSideGreenPrevState = LOW;
+unsigned long buttonSideBlueTime = 0;
+unsigned long buttonSideGreenTime = 0;
 
-const int buttonPowerPin = -1;
-int buttonPowerState = 0;
+const int buttonPowerPin = 52;
+int buttonPowerState = LOW;
+int buttonPowerPrevState = LOW;
+unsigned long buttonPowerTime = 0;
 
-const int buttonStickPin = -1;
+/*const int buttonStickPin = -1;
 const int axisXPositivePin = -1;
 const int axisXNegativePin = -1;
 const int axisYPositivePin = -1;
@@ -28,20 +38,32 @@ int buttonStickState = 0;
 int axisXPositiveState = 0;
 int axisXNegativeState = 0;
 int axisYPositiveState = 0;
-int axisYNegativeState = 0;
+int axisYNegativeState = 0;*/
+const int xPin = 1;
+const int yPin = 2;
+const int switchStickPin = 3;
+int xState = 0;
+int yState = 0;
+int switchStickState = 0;
+bool hit = false;
 
-const int switch1Pin = -1;
-const int switch2Pin = -1;
-const int switch3Pin = -1;
-const int switch4Pin = -1;
+const int switch1Pin1 = A4;
+const int switch1Pin2 = A5;
+const int switch2Pin1 = A6;
+const int switch2Pin2 = A7;
+const int switch3Pin1 = A8;
+const int switch3Pin2 = A9;
+const int switch4Pin1 = A10;
+const int switch4Pin2 = A11;
 int switch1State = 0;
 int switch2State = 0;
 int switch3State = 0;
 int switch4State = 0;
 
-const int switchBigPin = -1;
+const int switchBigPin1 = DAC0;
+const int switchBigPin2 = DAC1;
 int switchBigState = 0;
-
+/*
 const int sensorLightPin = -1;
 int sensorLightState = 0;
 
@@ -73,41 +95,190 @@ const int ledsSidePin = -1;
 int ledsSideState = 0;
 
 const int digitalNumberPin = -1;
-int digitalNumberState = 0;
+int digitalNumberState = 0;*/
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
 
-  pinMode(bigButtonPin, INPUT);
-  pinMode(buttonTopGreenPin, INPUT);
-  pinMode(buttonTopRedPin, INPUT);
-  pinMode(buttonSideBluePin, INPUT);
-  pinMode(buttonSideRedPin, INPUT);
-  pinMode(buttonPowerPin, INPUT);
-  pinMode(buttonStickPin, INPUT);
+  //pinMode(bigButtonPin, INPUT);
+  pinMode(buttonTopGreenPin, INPUT_PULLUP);
+  pinMode(buttonTopRedPin, INPUT_PULLUP);
+  pinMode(buttonSideBluePin, INPUT_PULLUP);
+  pinMode(buttonSideGreenPin, INPUT_PULLUP);
+  pinMode(buttonPowerPin, INPUT_PULLUP);
+  
+  /*pinMode(buttonStickPin, INPUT);
   pinMode(axisXPositivePin, INPUT);
   pinMode(axisXNegativePin, INPUT);
   pinMode(axisYPositivePin, INPUT);
-  pinMode(axisNegativePin, INPUT);
-  pinMode(switch1Pin, INPUT);
-  pinMode(switch2Pin, INPUT);
-  pinMode(switch3Pin, INPUT);
-  pinMode(switch4Pin, INPUT);
-  pinMode(switchBigPin, INPUT);
-  pinMode(sensorLightPin, INPUT);
+  pinMode(axisNegativePin, INPUT);*/
+  /*pinMode(xPin, INPUT);
+  pinMode(yPin, INPUT);
+  pinMode(switchStickPin, INPUT);*/
+
+  pinMode(switch1Pin1, INPUT_PULLUP);
+  pinMode(switch2Pin1, INPUT_PULLUP);
+  pinMode(switch3Pin1, INPUT_PULLUP);
+  pinMode(switch4Pin1, INPUT_PULLUP);
+  pinMode(switch1Pin2, INPUT_PULLUP);
+  pinMode(switch2Pin2, INPUT_PULLUP);
+  pinMode(switch3Pin2, INPUT_PULLUP);
+  pinMode(switch4Pin2, INPUT_PULLUP);
+  pinMode(switchBigPin1, INPUT_PULLUP);
+  pinMode(switchBigPin2, INPUT_PULLUP);
+  
+  /*pinMode(sensorLightPin, INPUT);
   pinMode(sensorSoundPin, INPUT);
   pinMode(sensorMotionPin, INPUT);
   pinMode(fanPin, INPUT);
   pinMode(heaterPin, INPUT);
   pinMode(ledsTopPin, INPUT);
   pinMode(ledsSidePin, INPUT);
-  pinMode(digitalNumberPin, INPUT);
+  pinMode(digitalNumberPin, INPUT);*/
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  Serial.print("Hellou");
+  /*xState = analogRead(xPin);
+  yState = analogRead(yPin);
+  switchStickState = digitalRead(switchStickPin);
 
-  delay(250);
+  joystickAxis();
+  joystickSwitch();*/
+
+  /*buttonPowerState = digitalRead(buttonPowerPin);
+
+  buttonPower();
+
+  buttonSideGreenState = digitalRead(buttonSideGreenPin);
+  buttonSideGreen();
+
+  delay(250);*/
+  //Serial.println("Hello");
+  //buttonSideGreenState = digitalRead(buttonSideGreenPin);
+  //buttonSideGreen();
+
+  //buttonTopRedState = digitalRead(buttonTopRedPin);
+  //buttonTopRed();
+
+  buttonPress(buttonTopRedPin, buttonTopRedState, buttonTopRedPrevState, buttonTopRedTime);
+  buttonPress(buttonTopGreenPin, buttonTopGreenState, buttonTopGreenPrevState, buttonTopGreenTime);
+  buttonPress(buttonSideBluePin, buttonSideBlueState, buttonSideBluePrevState, buttonSideBlueTime);
+  buttonPress(buttonSideGreenPin, buttonSideGreenState, buttonSideGreenPrevState, buttonSideGreenTime);
+  buttonPress(buttonPowerPin, buttonPowerState, buttonPowerPrevState, buttonPowerTime);
+
+  switchBigState = digitalRead(switchBigPin1) > digitalRead(switchBigPin2) ? LOW : HIGH;
+  switch1State = digitalRead(switch1Pin1) > digitalRead(switch1Pin2) ? LOW : HIGH;
+  switch2State = digitalRead(switch2Pin1) > digitalRead(switch2Pin2) ? LOW : HIGH;
+  switch3State = digitalRead(switch3Pin1) > digitalRead(switch3Pin2) ? LOW : HIGH;
+  switch4State = digitalRead(switch4Pin1) > digitalRead(switch4Pin2) ? LOW : HIGH;
+
+  //Serial.println(switch4State);
+  //Serial.println("Hello");
+}
+
+void buttonPress(int pin, int &state, int &prev, unsigned long &time)
+{
+    int reading = digitalRead(pin);
+
+    if (reading == HIGH && prev == LOW && millis() - time > 200)
+    {
+        if (state == HIGH)
+        {
+            state = LOW;
+        }
+        else
+        {
+            state = HIGH;
+        }
+
+        time = millis();
+    }
+
+    prev = reading;
+}
+
+/*void joystickAxis()
+{
+    // -Y direction
+    if (xState >= 0 && yState <= 10)
+    {
+        Serial.println("X-axis: " + xState);
+        Serial.println("Y-axis: " + yState);
+    }
+    // -X direction
+    if (xState <= 10 && yState >= 500)
+    {
+        Serial.println("X-axis: " + xState);
+        Serial.println("Y-axis: " + yState);
+    }
+    // +X direction
+    if (xState >= 1020 && yState >= 500)
+    {
+        Serial.println("X-axis: " + xState);
+        Serial.println("Y-axis: " + yState);
+    }
+    // +Y direction
+    if (xState >= 500 && yState >= 1020)
+    {
+        Serial.println("X-axis: " + xState);
+        Serial.println("Y-axis: " + yState);
+    }
+}
+
+void joystickSwitch()
+{
+    if (switchStickState == HIGH)
+    {
+        if (hit)
+        {
+            hit = false;
+            switchStickState == HIGH;
+        }
+        else
+        {
+            hit = true;
+            switchStickState == LOW;
+        }
+
+        Serial.println("Switch pressed");
+    }
+}*/
+
+/*void buttonPower()
+{
+    if (buttonPowerState == HIGH)
+    {
+        Serial.println("Power button turned on");
+    }
+    if (buttonPowerState == LOW)
+    {
+        Serial.println("Power button turned off");
+    }
+}*/
+
+void buttonSideGreen()
+{
+    if (buttonSideGreenState == HIGH)
+    {
+        Serial.println("Side green button turned on");
+    }
+    if (buttonSideGreenState == LOW)
+    {
+        Serial.println("Side green button turned off");
+    }
+}
+
+
+void buttonTopRed()
+{
+    if (buttonTopRedState == HIGH)
+    {
+        Serial.println("Top red button turned on");
+    }
+    if (buttonTopRedState == LOW)
+    {
+        Serial.println("Top red button turned off");
+    }
 }
