@@ -1,4 +1,4 @@
-//#include <MaxMatrix.h>
+#include <MaxMatrix.h>
 //#include <I2Cdev.h>
 //#include <MPU9250.h>
 
@@ -80,22 +80,42 @@ int sensorMotionAccStateZ = 0;
 int sensorMotionMagStateX = 0;
 int sensorMotionMagStateY = 0;
 int sensorMotionMagStateZ = 0;
+*/
 
 // Outputs
-const int fanPin = -1;
-int fanState = 0;
+const int fanPin = 53;
+int fanState = HIGH;
 
+/*
 const int heaterPin = -1;
 int heaterState = 0;
+*/
+const int ledsTopDin = 50;
+const int ledsTopCs = 48;
+const int ledsTopClk = 46;
+int ledsMaxInUse = 2;
+MaxMatrix ledsTop(ledsTopDin, ledsTopCs, ledsTopClk, ledsMaxInUse); 
 
-const int ledsTopPin = -1;
-int ledsTopState = 0;
+const unsigned char ledSignA[] = {4, 8,
+            B01111110,
+            B00010001,
+            B00010001,
+            B01111110,
+           };
 
-const int ledsSidePin = -1;
-int ledsSideState = 0;
+ const unsigned char ledSignSmile[] = {8, 8,
+        B00111100,
+        B01000010,
+        B10010101,
+        B10100001,
+        B10100001,
+        B10010101,
+        B01000010,
+        B00111100
+       };
 
-const int digitalNumberPin = -1;
-int digitalNumberState = 0;*/
+//const int digitalNumberPin = -1;
+//int digitalNumberState = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -131,14 +151,22 @@ void setup() {
   /*pinMode(sensorLightPin, INPUT);
   pinMode(sensorSoundPin, INPUT);
   pinMode(sensorMotionPin, INPUT);
-  pinMode(fanPin, INPUT);
   pinMode(heaterPin, INPUT);
   pinMode(ledsTopPin, INPUT);
   pinMode(ledsSidePin, INPUT);
   pinMode(digitalNumberPin, INPUT);*/
+
+  pinMode(fanPin, OUTPUT);
+
+  ledsTop.init(); // MAX7219 initialization
+  ledsTop.setIntensity(15);
+  //ledsTop.setDot(6,2,true); 
+  ledsTop.writeSprite(0, 0, ledSignSmile);
+  ledsTop.writeSprite(8, 0, ledSignSmile);
 }
 
 void loop() {
+  
   // put your main code here, to run repeatedly:
   /*xState = analogRead(xPin);
   yState = analogRead(yPin);
@@ -174,8 +202,22 @@ void loop() {
   switch3State = digitalRead(switch3Pin1) > digitalRead(switch3Pin2) ? LOW : HIGH;
   switch4State = digitalRead(switch4Pin1) > digitalRead(switch4Pin2) ? LOW : HIGH;
 
+  if(buttonTopRedState == HIGH) Serial.println("buttonTopRed press");
+  if(buttonTopGreenState == HIGH) Serial.println("buttonTopGreen press");
+  if(buttonSideBlueState == HIGH) Serial.println("buttonSideBlue press");
+  if(buttonSideGreenState == HIGH) Serial.println("buttonSideGreen press");
+  if(buttonPowerState == HIGH) Serial.println("buttonPower press");
+
+  if(switchBigState == HIGH) Serial.println("switchBig toggled");
+  if(switch1State == HIGH) Serial.println("switch1 toggled");
+  if(switch2State == HIGH) Serial.println("switch2 toggled");
+  if(switch3State == HIGH) Serial.println("switch3 toggled");
+  if(switch4State == HIGH) Serial.println("switch4 toggled");
+
   //Serial.println(switch4State);
   //Serial.println("Hello");
+
+    digitalWrite(fanPin, fanState);
 }
 
 void buttonPress(int pin, int &state, int &prev, unsigned long &time)
